@@ -1,0 +1,19 @@
+Source: slingscold-launcher
+Section: x11
+Priority: optional
+Maintainer: Juan Pablo Lozano <libredeb@gmail.com>
+Build-Depends: debhelper (>= 5), cdbs, cmake (>= 2.6), valac-0.14, 
+               libglib2.0-dev (>= 2.22.0), libgtk2.0-dev (>= 2.22.0), 
+               libgee-dev (>= 0.5.3), libunique-dev (>= 0.9), 
+               libgnome-menu-dev, libwnck-dev, libvala-0.14-dev
+Standards-Version: 3.9.3
+
+Package: slingscold-launcher
+Architecture: any
+Depends: ${misc:Depends}, 
+         libc6, libglib2.0-0 (>= 2.22.0), 
+         libgtk2.0-0 (>= 2.22.0), libunique-1.0-0 (>= 0.9), 
+         libgnome-menu2, libwnck22
+Description: Slingscold es una modificacion ligera de Slingshot
+ Slingshot es un liegro lanzador de elementary, escrito en Vala
+ y utilizando GTK+ y Cairo.

@@ -1,0 +1,16 @@
+slingscold-launcher (1.0.1-1) precise; urgency=low
+
+  * move search bar position to top center 
+    - align to center of screen
+  
+ -- Juan Pablo Lozano <libredeb@gmail.com>  Wed, 31 Jul 2013 16:02:17 +0800
+
+slingscold-launcher (1.0.0-1) precise; urgency=low
+
+  * v 1.0.0, forked from slingshot-launcher 0.0.1~pre-0~48~oneiric1
+  * dependencies changed:
+    - valac-0.14
+    - libvala-0.14-0
+  * move search bar position to top 
+  
+ -- Juan Pablo Lozano <libredeb@gmail.com>  Mon, 29 Jul 2013 23:02:17 +0800

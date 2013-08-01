@@ -1,0 +1,4 @@
+#!/bin/bash
+
+wget -O /usr/share/icons/slingscold.png https://www.dropbox.com/s/z3bty0fs3e4tu8c/slingscold.png
+wget -O /usr/share/applications/slingscold.desktop https://www.dropbox.com/s/xmakx3wwgwzflun/slingscold.desktop
