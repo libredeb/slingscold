@@ -1,30 +1,52 @@
-To install Slingshot from the source, you need to compile it.
+To install Slingscold from the source, you need to compile it.
+
+== Dependencies ==
+[Fedora]
+ - cmake
+ - libgee-devel
+ - gnome-menus-devel
+ - cdbs
+ - vala
+ - libvala-devel
+ - glib-devel
+ - libwnck-devel
+ - gtk3-devel
+
+[Ubuntu]
+ - cmake
+ - libgee-0.8-dev
+ - libgnome-menu-3-dev
+ - cdbs
+ - valac
+ - libvala-<version>-dev
+ - libglib2.0-dev
+ - libwnck-3-dev
+ - libgtk-3-dev
 
 == Compilation ==
 
 - First, we need a build directory:
-    mkdir build
-    cd build
+    $ mkdir build
+    $ cd build
 - Then, configure CMake:
-    cmake ..
-    Here, you can get some errors if you don't have all the dependencies.
+    $ cmake ..
+  ** Here, you can get some errors if you don't have all the dependencies.
 - Compile it:
-    make
-    You can also use make -j3 if you have a dual core. (it will be much faster)
+    $ make
+  ** You can also use make -j3 if you have a dual core. (it will be much faster)
 
-== Launch Slingshot ==
+== Launch Slingscold ==
 
-- Just run slingshot:
-    ./slingshot
+- Just run Slingscold:
+    ./slingscold
 
-== Install Slingshot ==
+== Install Slingscold in the System ==
 
 - With the administrator rights, use:
-    make install
+    # make install
     Or:
-    sudo make install
+    $ sudo make install
 
-- You can now launch Slingshot using:
-    slingshot
-    Or:
-    /usr/local/bin/slingshot
+- You can now launch Slingscold using:
+    $ slingscold
+  ** in the command line or using the application icon installed

@@ -1,12 +1,28 @@
-
-namespace Slingshot.Frontend {
+/* Copyright 2020 Juan Lozano <libredeb@gmail.com>
+*
+* This file is part of Slingscold.
+*
+* Slingscold is free software: you can redistribute it
+* and/or modify it under the terms of the GNU General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Slingscold is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+* Public License for more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with Slingscold. If not, see http://www.gnu.org/licenses/.
+*/
+namespace Slingscold.Frontend {
 
     public class AppItem : Gtk.EventBox {
     
         private Gdk.Pixbuf icon;
-        private Slingshot.Frontend.Color prominent;
+        private Slingscold.Frontend.Color prominent;
         private string label;
-        private Gtk.VBox wrapper;
+        private Gtk.Box wrapper;
         private int icon_size;
         
         const int FPS = 24;
@@ -20,19 +36,18 @@ namespace Slingshot.Frontend {
             // EventBox Properties
             this.set_visible_window(false);
             this.can_focus = true;
-            this.set_size_request (icon_size * 2, icon_size + 30); // 30 is the padding between icon and label and label's height
+            // 30 is the padding between icon and label's height
+            this.set_size_request (icon_size * 3, icon_size + 30); 
             
             // VBox properties
-            this.wrapper = new Gtk.VBox (false, 0);
-            this.wrapper.expose_event.connect (this.draw_icon);
+            this.wrapper = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            this.wrapper.draw.connect (this.draw_icon);
             this.add (this.wrapper);
-		    
-		    
+
 		    // Focused signals
-		    this.expose_event.connect (this.draw_background);
-		    this.focus_in_event.connect ( () => { this.focus_in (); return true;} );
-		    this.focus_out_event.connect ( () => { this.focus_out (); return true;} );
-		    
+            this.draw.connect (this.draw_background);
+            this.focus_in_event.connect ( () => { this.focus_in (); return true;} );
+            this.focus_out_event.connect ( () => { this.focus_out (); return true;} );
         }
         
         public void change_app (Gdk.Pixbuf new_icon, string new_name, string new_tooltip) {
@@ -40,7 +55,7 @@ namespace Slingshot.Frontend {
             
             // Icon
             this.icon = new_icon;
-            this.prominent = Slingshot.Frontend.Utilities.average_color (this.icon);
+            this.prominent = Slingscold.Frontend.Utilities.average_color (this.icon);
             
             // Label
             this.label = new_name;
@@ -54,9 +69,9 @@ namespace Slingshot.Frontend {
         
         public new void focus_in () {
             
-            GLib.Timeout.add (((int)(1000/this.FPS)), () => {
-				if (this.current_frame >= this.RUN_LENGTH || !this.has_focus) {
-				    current_frame = 1;
+            GLib.Timeout.add (((int)(1000/FPS)), () => {
+				if (this.current_frame >= RUN_LENGTH || !this.has_focus) {
+                    current_frame = 1;
 					return false; // stop animation
 				}
 				queue_draw ();
@@ -68,9 +83,9 @@ namespace Slingshot.Frontend {
         
         public new void focus_out () {
             
-            GLib.Timeout.add (((int)(1000/this.FPS)), () => {
-				if (this.current_frame >= this.RUN_LENGTH || this.has_focus) {
-				    current_frame = 1;
+            GLib.Timeout.add (((int)(1000/FPS)), () => {
+				if (this.current_frame >= RUN_LENGTH || this.has_focus) {
+                    current_frame = 1;
 					return false; // stop animation
 				}
 				queue_draw ();
@@ -80,10 +95,10 @@ namespace Slingshot.Frontend {
             
         }
         
-        private bool draw_icon (Gtk.Widget widget, Gdk.EventExpose event) {
+        private bool draw_icon (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.window);
+            var context = Gdk.cairo_create (widget.get_window ());
             
             // Draw icon
             Gdk.cairo_set_source_pixbuf (context, this.icon, size.x + ((this.icon.width - size.width) / -2.0), size.y);
@@ -93,7 +108,7 @@ namespace Slingshot.Frontend {
             Cairo.TextExtents extents;
             context.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
             context.set_font_size (11.5);
-            Slingshot.Frontend.Utilities.truncate_text (context, size, 10, this.label, out this.label, out extents); // truncate text
+            Slingscold.Frontend.Utilities.truncate_text (context, size, 10, this.label, out this.label, out extents); // truncate text
             
             // Draw text shadow
             context.move_to ((size.x + size.width/2 - extents.width/2) + 1, (size.y + size.height - 10) + 1);
@@ -108,14 +123,14 @@ namespace Slingshot.Frontend {
             return false;
         }
         
-        private bool draw_background (Gtk.Widget widget, Gdk.EventExpose event) {
+        private bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.window);
+            var context = Gdk.cairo_create (widget.get_window ());
             
             double progress;
             if (this.current_frame > 1) {
-                progress = (double)this.RUN_LENGTH/(double)this.current_frame;
+                progress = (double)RUN_LENGTH/(double)this.current_frame;
             } else {
                 progress = 1;
             }
@@ -128,7 +143,7 @@ namespace Slingshot.Frontend {
                 linear_gradient.add_color_stop_rgba (1.0, this.prominent.R, this.prominent.G, this.prominent.B, 0.4/progress);
                 
                 context.set_source (linear_gradient);
-                Slingshot.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
+                Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
                 context.fill ();
                 
             }  else  {
@@ -139,7 +154,7 @@ namespace Slingshot.Frontend {
                     linear_gradient.add_color_stop_rgba (1.0, this.prominent.R, this.prominent.G, this.prominent.B, 0.4 - 0.4/progress);
                     
                     context.set_source (linear_gradient);
-                    Slingshot.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
+                    Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
                     context.fill ();
                 }
             }

@@ -1,11 +1,27 @@
+/* Copyright 2020 Juan Lozano <libredeb@gmail.com>
+*
+* This file is part of Slingscold.
+*
+* Slingscold is free software: you can redistribute it
+* and/or modify it under the terms of the GNU General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Slingscold is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+* Public License for more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with Slingscold. If not, see http://www.gnu.org/licenses/.
+*/
+namespace Slingscold.Frontend {
 
-namespace Slingshot.Frontend {
-
-    public class Searchbar : Gtk.HBox {
+    public class Searchbar : Gtk.Box {
         
         // Constants
-        const int WIDTH = 240;
-        const int HEIGHT = 24;
+        const int WIDTH = 240; // Search bar width
+        const int HEIGHT = 26; // Search bar height
         
         // Signals
         public signal void changed ();
@@ -33,7 +49,10 @@ namespace Slingshot.Frontend {
         public Gtk.Image search_icon;
         private Gtk.Image clear_icon;
         public string hint_string;
-        private bool is_hinted = true; // protects against bug where get_text () will return "" if the user happens to type in the hint string
+
+        // protects against bug where get_text() will return "" if the user 
+        // happens to type in the hint string
+        private bool is_hinted = true;
         
 
         public Searchbar (string hint) {
@@ -42,19 +61,22 @@ namespace Slingshot.Frontend {
             this.buffer.text = this.hint_string;
             
             // HBox properties
-            this.homogeneous = false;
-            this.can_focus = false;
-            this.set_size_request (this.WIDTH, this.HEIGHT);
+
+            this.set_homogeneous (false);
+            this.set_can_focus (false);
+            this.set_size_request (WIDTH, HEIGHT);
         
             // Wrapper 
-            var wrapper = new Gtk.HBox (false, 3);
+            // space between the icon and the phrase search
+            var wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
             this.add (wrapper);
             
-            // Pack gtk-find icon
+            // Pack edit-find-symbolic icon
             var search_icon_wrapper = new Gtk.EventBox ();
             search_icon_wrapper.set_visible_window (false);
-            this.search_icon = new Gtk.Image.from_stock("gtk-find", Gtk.IconSize.MENU);
+            this.search_icon = new Gtk.Image.from_icon_name("edit-find-symbolic", Gtk.IconSize.MENU); //search icon
             search_icon_wrapper.add (this.search_icon);
+            search_icon_wrapper.border_width = 4;
             search_icon_wrapper.button_release_event.connect ( () => {return true;});
             wrapper.pack_start (search_icon_wrapper, false, true, 3);
             
@@ -65,40 +87,32 @@ namespace Slingshot.Frontend {
             this.label.selectable = true;
             this.label.can_focus = false;
             this.label.set_single_line_mode (true);
-            
-            wrapper.pack_start (this.label);
+            wrapper.pack_start (this.label, true, true, 0);
             
             // Clear icon
             var clear_icon_wrapper = new Gtk.EventBox ();
             clear_icon_wrapper.set_visible_window (false);
+            clear_icon_wrapper.border_width = 4;
             var stock_item = Gtk.StockItem ();
             stock_item.stock_id = "edit-clear-symbolic";
             stock_item.label = null;
             stock_item.modifier = 0;
             stock_item.keyval = 0;
-            stock_item.translation_domain = Gtk.Stock.CLEAR;
-            var factory = new Gtk.IconFactory ();
-            var icon_set = new Gtk.IconSet ();
-            var icon_source = new Gtk.IconSource ();
-            icon_source.set_icon_name (Gtk.Stock.CLEAR);
-            icon_set.add_source (icon_source);
-            icon_source.set_icon_name ("edit-clear-symbolic");
-            icon_set.add_source (icon_source);
-            factory.add ("edit-clear-symbolic", icon_set);
-            Gtk.Stock.add ({stock_item});
-            factory.add_default ();
-            this.clear_icon = new Gtk.Image.from_stock("edit-clear-symbolic", Gtk.IconSize.MENU);
+            stock_item.translation_domain = "edit-clear";
+            this.clear_icon = new Gtk.Image.from_icon_name("edit-clear-symbolic", Gtk.IconSize.MENU);
             
             clear_icon_wrapper.add (this.clear_icon);
             clear_icon_wrapper.button_release_event.connect ( () => { this.hint (); return true; });
+            clear_icon_wrapper.set_hexpand (true);
+            clear_icon_wrapper.set_halign (Gtk.Align.END);
             wrapper.pack_end (clear_icon_wrapper, false, true, 3);
             
             // Connect signals and callbacks
             this.buffer.changed.connect (on_changed);
-            this.expose_event.connect (this.draw_background);
+            this.draw.connect (this.draw_background);
             this.realize.connect (() => {
-				this.hint (); // hint it
-			});
+                this.hint (); // hint it
+            });
         
         }
         
@@ -116,19 +130,19 @@ namespace Slingshot.Frontend {
         
         
         private void grey_out () {
-            var color = Gdk.Color ();
-            Gdk.Color.parse ("#a0a0a0", out color);
-            this.label.modify_fg (Gtk.StateType.NORMAL, color);
-            this.label.modify_font (Pango.FontDescription.from_string ("italic"));
+            var color = Gdk.RGBA ();
+            color.parse ("#a0a0a0");
+            this.label.override_color (Gtk.StateFlags.NORMAL, color);
+            this.label.override_font (Pango.FontDescription.from_string ("italic"));
             this.is_hinted = true;
         }
         
         private void reset_font () {
         
-            var color = Gdk.Color ();
-            Gdk.Color.parse ("#444", out color);
-            this.label.modify_fg (Gtk.StateType.NORMAL, color);
-            this.label.modify_font (Pango.FontDescription.from_string ("normal"));
+            var color = Gdk.RGBA ();
+            color.parse ("#444");
+            this.label.override_color (Gtk.StateFlags.NORMAL, color);
+            this.label.override_font (Pango.FontDescription.from_string ("normal"));
             this.is_hinted = false;
         
         }
@@ -138,27 +152,27 @@ namespace Slingshot.Frontend {
             this.changed ();
         }
         
-        private bool draw_background (Gtk.Widget widget, Gdk.EventExpose event) {
+        private bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.window);
+            var context = Gdk.cairo_create (widget.get_window ());
             
             // Draw bottom white border
-            Slingshot.Frontend.Utilities.draw_rounded_rectangle (context, 3, -0.5, size);
+            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 12, -0.5, size);
             var linear_stroke = new Cairo.Pattern.linear(size.x, size.y, size.x, size.y + size.height);
-	        linear_stroke.add_color_stop_rgba (0.0,  1.0, 1.0, 1.0, 0.0);
-	        linear_stroke.add_color_stop_rgba (0.85,  1.0, 1.0, 1.0, 0.0);
-	        linear_stroke.add_color_stop_rgba (1.0,  1.0, 1.0, 1.0, 0.4);
+            linear_stroke.add_color_stop_rgba (0.0,  1.0, 1.0, 1.0, 0.0);
+            linear_stroke.add_color_stop_rgba (0.85,  1.0, 1.0, 1.0, 0.0);
+            linear_stroke.add_color_stop_rgba (1.0,  1.0, 1.0, 1.0, 0.4);
             context.set_source (linear_stroke);
             context.fill ();
             
-            Slingshot.Frontend.Utilities.draw_rounded_rectangle (context, 3, 0.5, size);
+            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 12, 0.5, size);
             
             // Draw background gradient
             var linear_fill = new Cairo.Pattern.linear(size.x, size.y, size.x, size.y + size.height);
-	        linear_fill.add_color_stop_rgb(0.0,  0.85, 0.85, 0.85);
-	        linear_fill.add_color_stop_rgb(0.25,  1.0, 1.0, 1.0);
-	        linear_fill.add_color_stop_rgb(1.0,  1.0, 1.0, 1.0);
+            linear_fill.add_color_stop_rgb(0.0,  0.85, 0.85, 0.85);
+            linear_fill.add_color_stop_rgb(0.25,  1.0, 1.0, 1.0);
+            linear_fill.add_color_stop_rgb(1.0,  1.0, 1.0, 1.0);
             context.set_source (linear_fill);
             context.fill_preserve ();
             
@@ -169,7 +183,7 @@ namespace Slingshot.Frontend {
             
             // Draw inner stroke
             // Draw bottom white border
-            Slingshot.Frontend.Utilities.draw_rounded_rectangle (context, 3, 1.5, size);
+            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 12, 1.5, size);
             context.set_source_rgba (0.0, 0.0, 0.0, 0.2);
             context.stroke ();
             

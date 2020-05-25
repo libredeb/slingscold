@@ -1,21 +1,21 @@
-/***
-BEGIN LICENSE
-Copyright (C) 2011 Maxwell Barvian <mbarvian@gmail.com>
-This program is free software: you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License version 2.1, as published
-by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranties of
-MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
-PURPOSE.\  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program.  If not, see <http://www.gnu.org/licenses/>.
-END LICENSE
-***/
-
-namespace Slingshot.Frontend {
+/* Copyright 2020 Juan Lozano <libredeb@gmail.com>
+*
+* This file is part of Slingscold.
+*
+* Slingscold is free software: you can redistribute it
+* and/or modify it under the terms of the GNU General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Slingscold is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+* Public License for more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with Slingscold. If not, see http://www.gnu.org/licenses/.
+*/
+namespace Slingscold.Frontend {
 
     public class Indicators : Gtk.HBox {
 
@@ -47,19 +47,20 @@ namespace Slingshot.Frontend {
             indicator.set_visible_window (false);
 
             var label = new Gtk.Label(thelabel);
-            Gdk.Color white;
-            Gdk.Color.parse("#FFFFFF", out white);
-            label.modify_fg (Gtk.StateType.NORMAL, white);
+            var white = Gdk.RGBA ();
+            white.parse("#FFFFFF");
+            label.override_color (Gtk.StateFlags.NORMAL, white);
             var font = new Pango.FontDescription ();
             font.set_size (9500);
             font.set_weight (Pango.Weight.HEAVY);
-            label.modify_font (font);
+            label.override_font (font);
 
-            indicator.add(Slingshot.Frontend.Utilities.wrap_alignment(label, 5, 15, 5, 15)); // make sure the child widget is added with padding
+            // make sure the child widget is added with padding
+            indicator.add(Slingscold.Frontend.Utilities.wrap_alignment(label, 5, 15, 5, 15));
             this.children.append(indicator);
 
 
-            this.expose_event.connect(draw_background);
+            this.draw.connect(draw_background);
             indicator.button_release_event.connect( () => {
 
                 this.set_active(this.children.index(indicator));
@@ -106,9 +107,9 @@ namespace Slingshot.Frontend {
             this.current_frame = 0;
             this.animation_active = true;
 
-            this.animation_loop_id = GLib.Timeout.add (((int)(1000 / this.FPS)), () => {
+            this.animation_loop_id = GLib.Timeout.add (((int)(1000 / FPS)), () => {
 				if (this.current_frame >= this.animation_frames) {
-				    end_animation();
+                    end_animation();
 					return false; // stop animation
 				}
 
@@ -123,10 +124,10 @@ namespace Slingshot.Frontend {
             current_frame = 0;
         }
 
-        protected bool draw_background (Gtk.Widget widget, Gdk.EventExpose event) {
+        protected bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
             Gtk.Allocation size;
             widget.get_allocation (out size);
-            var context = Gdk.cairo_create (widget.window);
+            var context = Gdk.cairo_create (widget.get_window ());
 
 
             double d = (double) this.animation_frames;
@@ -148,9 +149,9 @@ namespace Slingshot.Frontend {
             double x = size_old.x + (size_new.x - (double) size_old.x) * progress;
             double width = size_old.width + (size_new.width - (double) size_old.width) * progress;
 
-            context.set_source_rgba (0.0, 0.0, 0.0, 0.70);
+            context.set_source_rgba (0.2, 0.2, 0.2, 0.7); //gray color
             double offset = 0.0;
-            double radius = 3.0;
+            double radius = 18.0;
             context.move_to (x + radius, size.y + offset);
 		    context.arc (x + width - radius - offset, size.y + radius + offset, radius, Math.PI * 1.5, Math.PI * 2);
 		    context.arc (x + width - radius - offset, size.y + size.height - radius - offset, radius, 0, Math.PI * 0.5);

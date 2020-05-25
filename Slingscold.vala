@@ -1,39 +1,60 @@
-public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
+/* Copyright 2020 Juan Lozano <libredeb@gmail.com>
+*
+* This file is part of Slingscold.
+*
+* Slingscold is free software: you can redistribute it
+* and/or modify it under the terms of the GNU General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Slingscold is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+* Public License for more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with Slingscold. If not, see http://www.gnu.org/licenses/.
+*/
+public class SlingscoldWindow : Widgets.CompositedWindow {
 
-    public GLib.List<Slingshot.Frontend.AppItem> children = new GLib.List<Slingshot.Frontend.AppItem> ();
-    public Slingshot.Frontend.Searchbar searchbar;
-    public Slingshot.Frontend.Grid grid;
+    public GLib.List<Slingscold.Frontend.AppItem> children = new GLib.List<Slingscold.Frontend.AppItem> ();
+    public Slingscold.Frontend.Searchbar searchbar;
+    public Gtk.Grid grid;
     
     public Gee.ArrayList<Gee.HashMap<string, string>> apps = new Gee.ArrayList<Gee.HashMap<string, string>> ();
     public Gee.HashMap<string, Gdk.Pixbuf> icons = new Gee.HashMap<string, Gdk.Pixbuf>();
     public Gee.ArrayList<Gee.HashMap<string, string>> filtered = new Gee.ArrayList<Gee.HashMap<string, string>> ();
     
-    public Slingshot.Frontend.Indicators pages;
-    public Slingshot.Frontend.Indicators categories;
-    public Gee.ArrayList<GMenu.TreeDirectory> all_categories = Slingshot.Backend.GMenuEntries.get_categories ();
+    public Slingscold.Frontend.Indicators pages;
+    public Slingscold.Frontend.Indicators categories;
+    public Gee.ArrayList<GMenu.TreeDirectory> all_categories = Slingscold.Backend.GMenuEntries.get_categories ();
     public int icon_size;
     public int total_pages;
-    public Gtk.HBox top_spacer;
+    public Gtk.Box top_spacer;
 
-    public SlingshotWindow () {
+    private int grid_x;
+    private int grid_y;
     
-        // Show desktop
-        Wnck.Screen.get_default().toggle_showing_desktop (false);
-        
-        // Window properties
-        this.title = "Slingshot";
-        this.skip_pager_hint = true;
-        this.skip_taskbar_hint = true;
-        this.set_type_hint (Gdk.WindowTypeHint.NORMAL);
-        this.maximize ();
-        this.stick ();
-        this.set_keep_above (true);
-        
-        // Set icon size
+    public SlingscoldWindow () {
+    
         Gdk.Rectangle monitor_dimensions;
         Gdk.Screen screen = Gdk.Screen.get_default();
         screen.get_monitor_geometry(screen.get_primary_monitor(), out monitor_dimensions);
         
+        // Show desktop
+        //Wnck.Screen.get_default().toggle_showing_desktop (false);
+        
+        // Window properties
+        this.set_title ("Slingscold");
+        //this.set_skip_pager_hint (true);
+        //this.set_skip_taskbar_hint (true);
+        this.set_type_hint (Gdk.WindowTypeHint.NORMAL);
+        this.fullscreen ();
+        //this.stick ();
+        //this.set_keep_above (true);
+        this.set_default_size (monitor_dimensions.width,  monitor_dimensions.height);
+
+        // Set icon size  
         double suggested_size = (Math.pow (monitor_dimensions.width * monitor_dimensions.height, ((double) (1.0/3.0))) / 1.6);
         if (suggested_size < 27) {
             this.icon_size = 24;
@@ -46,7 +67,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         }
         
         // Get all apps
-        Slingshot.Backend.GMenuEntries.enumerate_apps (Slingshot.Backend.GMenuEntries.get_all (), this.icons, this.icon_size, out this.apps);
+        Slingscold.Backend.GMenuEntries.enumerate_apps (Slingscold.Backend.GMenuEntries.get_all (), this.icons, this.icon_size, out this.apps);
         
         // Add container wrapper
         var wrapper = new Gtk.EventBox (); // used for the scrolling and button press events
@@ -54,14 +75,14 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         this.add (wrapper);
         
         // Add container
-        var container = new Gtk.VBox (false, 15);
+        var container = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
         wrapper.add (container);
-         
-        // Add top bar
-        var top = new Gtk.HBox (false, 0);
-        var bottom = new Gtk.HBox (false, 0);
         
-        this.categories = new Slingshot.Frontend.Indicators ();
+        // Add top bar
+        var top = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        var bottom = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        
+        this.categories = new Slingscold.Frontend.Indicators ();
         this.categories.child_activated.connect (this.change_category);
         this.categories.append ("All");
         foreach (GMenu.TreeDirectory category in this.all_categories) {
@@ -70,39 +91,51 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         
         //category appllication
         this.categories.set_active (0);
-        top.pack_start (this.categories, true, true, 20);
-       
-        this.top_spacer = new Gtk.HBox (false, 0);
+        //top.pack_start (this.categories, true, true, 20); // With categories or not
+        
+        this.top_spacer = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 20);
         this.top_spacer.realize.connect ( () => { this.top_spacer.visible = true; } );
         this.top_spacer.can_focus = true;
         bottom.pack_start (this.top_spacer, false, false, 0);
         
         //searchbar
-        this.searchbar = new Slingshot.Frontend.Searchbar ("Empiece a escribir para buscar...");
+        this.searchbar = new Slingscold.Frontend.Searchbar ("...");
         this.searchbar.changed.connect (this.search);
         //jarak samping
-		int medio = (monitor_dimensions.width / 2) - 120;
+        int medio = (monitor_dimensions.width / 2) - 120; //place the search bar in the center of the screen
         bottom.pack_start (this.searchbar, false, true, medio);
         
         //jarak atas 
         container.pack_start (bottom, false, true, 20); 
         container.pack_start (top, false, true, 0); 
         
+        this.grid = new Gtk.Grid();
+        this.grid.set_row_spacing (70);
+        this.grid.set_column_spacing (30);
+        this.grid.set_halign (Gtk.Align.CENTER);
         // Make icon grid and populate
-        if (monitor_dimensions.width > monitor_dimensions.height) { // normal landscape orientation
-            this.grid = new Slingshot.Frontend.Grid (4, 6);
-        } else { // most likely a portrait orientation
-            this.grid = new Slingshot.Frontend.Grid (6, 4);
+        if ((monitor_dimensions.width / (double)monitor_dimensions.height) < 1.4) { // Monitor 5:4, 4:3
+            this.grid_x = 5;
+            this.grid_y = 5;
+        } else { // Monitor 16:9
+            this.grid_x = 4;
+            this.grid_y = 6;
         }
+        // Initialize the grid
+        for (int r = 0; r < this.grid_x; r++)
+            this.grid.insert_row(r);
+        for (int c = 0; c < this.grid_y; c++)
+            this.grid.insert_column(c);
+
         container.pack_start (this.grid, true, true, 0);
         
         this.populate_grid ();
         
         // Add pages
-        this.pages = new Slingshot.Frontend.Indicators ();
+        this.pages = new Slingscold.Frontend.Indicators ();
         this.pages.child_activated.connect ( () => { this.update_grid (this.filtered); } );
         
-        var pages_wrapper = new Gtk.HBox (false, 0);
+        var pages_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
         pages_wrapper.set_size_request (-1, 30);        
         container.pack_end (pages_wrapper, false, true, 15);
         
@@ -117,18 +150,19 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         this.pages.set_active (0);
         
         // Signals and callbacks
-        this.button_release_event.connect ( () => { this.destroy(); return false; });
-        this.expose_event.connect (this.draw_background);
-        this.focus_out_event.connect ( () => { this.destroy(); return true; } ); // close slingshot when the window loses focus
+        this.add_events (Gdk.EventMask.SCROLL_MASK);
+        //this.button_release_event.connect ( () => { this.destroy(); return false; });
+        this.draw.connect (this.draw_background);
+        //this.focus_out_event.connect ( () => { this.destroy(); return true; } ); // close Slingscold when the window loses focus
     }
     
     private void populate_grid () {        
     
-        for (int r = 0; r < this.grid.n_rows; r++) {
+        for (int r = 0; r < this.grid_x; r++) {
             
-            for (int c = 0; c < this.grid.n_columns; c++) {
-                            
-                var item = new Slingshot.Frontend.AppItem (this.icon_size);
+            for (int c = 0; c < this.grid_y; c++) {
+                
+                var item = new Slingscold.Frontend.AppItem (this.icon_size);
                 this.children.append (item);
                 
                 item.button_press_event.connect ( () => { item.grab_focus (); return true; } );
@@ -137,7 +171,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
                 item.button_release_event.connect ( () => {
                     
                     try {
-                        new GLib.DesktopAppInfo.from_filename (this.filtered.get((int) (this.children.index(item) + (this.pages.active * this.grid.n_columns * this.grid.n_rows)))["desktop_file"]).launch (null, null);
+                        new GLib.DesktopAppInfo.from_filename (this.filtered.get((int) (this.children.index(item) + (this.pages.active * this.grid_y * this.grid_x)))["desktop_file"]).launch (null, null);
                         this.destroy();
                     } catch (GLib.Error e) {
                         stdout.printf("Error! Load application: " + e.message);
@@ -147,7 +181,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
                     
                 });
                 
-                this.grid.attach (item, c, c + 1, r, r + 1, Gtk.AttachOptions.EXPAND, Gtk.AttachOptions.EXPAND, 0, 0);
+                this.grid.attach (item, c, r, 1, 1);
                 
             } 
         }        
@@ -155,12 +189,12 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
     
     private void update_grid (Gee.ArrayList<Gee.HashMap<string, string>> apps) {    
         
-        int item_iter = (int)(this.pages.active * this.grid.n_columns * this.grid.n_rows);
-        for (int r = 0; r < this.grid.n_rows; r++) {
+        int item_iter = (int)(this.pages.active * this.grid_y * this.grid_x);
+        for (int r = 0; r < this.grid_x; r++) {
             
-            for (int c = 0; c < this.grid.n_columns; c++) {
+            for (int c = 0; c < this.grid_y; c++) {
                 
-                int table_pos = c + (r * (int)this.grid.n_columns); // position in table right now
+                int table_pos = c + (r * (int)this.grid_y); // position in table right now
                 
                 var item = this.children.nth_data(table_pos);
                 if (item_iter < apps.size) {
@@ -194,7 +228,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         this.filtered.clear ();
         
         if (this.categories.active != 0) {
-            Slingshot.Backend.GMenuEntries.enumerate_apps (Slingshot.Backend.GMenuEntries.get_applications_for_category (this.all_categories.get (this.categories.active - 1)), this.icons, this.icon_size, out this.filtered);
+            Slingscold.Backend.GMenuEntries.enumerate_apps (Slingscold.Backend.GMenuEntries.get_applications_for_category (this.all_categories.get (this.categories.active - 1)), this.icons, this.icon_size, out this.filtered);
         } else {
             this.filtered.add_all (this.apps);
         }
@@ -204,8 +238,8 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
     
     private void update_pages (Gee.ArrayList<Gee.HashMap<string, string>> apps) {
         // Find current number of pages and update count
-        var num_pages = (int) (apps.size / (this.grid.n_columns * this.grid.n_rows));
-        (double) apps.size % (double) (this.grid.n_columns * this.grid.n_rows) > 0 ? this.total_pages = num_pages + 1 : this.total_pages = num_pages;
+        var num_pages = (int) (apps.size / (this.grid_y * this.grid_x));
+        (double) apps.size % (double) (this.grid_y * this.grid_x) > 0 ? this.total_pages = num_pages + 1 : this.total_pages = num_pages;
         
         // Update pages
         if (this.total_pages > 1) {
@@ -227,7 +261,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         this.filtered.clear ();
         
         foreach (Gee.HashMap<string, string> app in this.apps) {
-            if (current_text in app["name"].down () || current_text in app["description"].down () || current_text in app["command"].down ()) {
+            if ((app["name"] != null && current_text in app["name"].down ()) || (app["description"] != null && current_text in app["description"].down ()) || (app["command"] != null && current_text in app["command"].down ())) {
                 this.filtered.add (app);
             }
         }     
@@ -253,16 +287,16 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
         
     }
 
-    private bool draw_background (Gtk.Widget widget, Gdk.EventExpose event) {
+    private bool draw_background (Gtk.Widget widget, Cairo.Context ctx) {
         Gtk.Allocation size;
         widget.get_allocation (out size);
-        var context = Gdk.cairo_create (widget.window); // directly onto the gdk.window
+        var context = Gdk.cairo_create (widget.get_window ());
 
         // Semi-dark background
         var linear_gradient = new Cairo.Pattern.linear (size.x, size.y, size.x, size.y + size.height);
-        linear_gradient.add_color_stop_rgba (0.0, 0.0, 0.0, 0.0, 0.65);
-        linear_gradient.add_color_stop_rgba (0.85, 0.0, 0.0, 0.0, 0.65);
-        linear_gradient.add_color_stop_rgba (0.99, 0.0, 0.0, 0.0, 0.0);
+        linear_gradient.add_color_stop_rgba (0.0, 0.0, 0.0, 0.0, 1);
+        linear_gradient.add_color_stop_rgba (0.50, 0.0, 0.0, 0.0, 0.85);
+        linear_gradient.add_color_stop_rgba (0.99, 0.0, 0.0, 0.0, 0.50);
                 
         context.set_source (linear_gradient);
         context.paint ();
@@ -288,7 +322,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
                 return true;
             case "Return":
                 if (this.filtered.size >= 1) {
-                    this.get_focus ().button_release_event (Gdk.EventButton ());
+                    this.get_focus ().button_release_event ((Gdk.EventButton) new Gdk.Event (Gdk.EventType.BUTTON_PRESS));
                 }
                 return true;
             case "BackSpace":
@@ -296,15 +330,14 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
                 return true;
             case "Left":
                 var current_item = this.grid.get_children ().index (this.get_focus ());
-                if (current_item % this.grid.n_columns == this.grid.n_columns - 1) {
+                if (current_item % this.grid_y == this.grid_y - 1) {
                     this.page_left ();
                     return true;
                 }
-                
                 break;
             case "Right":
                 var current_item = this.grid.get_children ().index (this.get_focus ());
-                if (current_item % this.grid.n_columns == 0) {
+                if (current_item % this.grid_y == 0) {
                     this.page_right ();
                     return true;
                 }
@@ -343,7 +376,7 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
     // Override destroy for fade out and stuff
     public new void destroy () {
         // Restore windows
-        Wnck.Screen.get_default ().toggle_showing_desktop (false);
+        //Wnck.Screen.get_default ().toggle_showing_desktop (false);
         
         base.destroy();
         Gtk.main_quit();
@@ -354,22 +387,15 @@ public class SlingshotWindow : ElementaryWidgets.CompositedWindow {
 int main (string[] args) {
 
 	Gtk.init (ref args);
-
-	Unique.App app = new Unique.App ("org.elementary.slingshot", null);
-	
-	if (app.is_running) { //close if already running
-		Unique.Command command = Unique.Command.NEW;
-		app.send_message (command, new Unique.MessageData());
-	} else {
-        
-		var main_win = new SlingshotWindow ();
-		main_win.show_all ();
-		
-		app.watch_window (main_win);
-		
-		Gtk.main ();
-	}
-	
+        Gtk.Application app = new Gtk.Application ("org.libredeb.slingscold", GLib.ApplicationFlags.FLAGS_NONE);	
+        app.activate.connect( () => {
+            if (app.get_windows ().length () == 0) {
+                var main_win = new SlingscoldWindow ();            
+                main_win.set_application (app);
+                main_win.show_all ();
+                Gtk.main ();
+            }});
+        app.run (args);
 	return 1;
 	
 }

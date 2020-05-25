@@ -1,9 +1,8 @@
-
 [Desktop Entry]
 Name=Slingscold
-Comment=Lanzador de aplicaciones
+Comment=Application Launcher
 Exec=slingscold
-Icon=/usr/share/icons/slingscold.png
+Icon=slingscold
 Type=Application
 Categories=GNOME;GTK;Utility;
 StartupNotify=false
