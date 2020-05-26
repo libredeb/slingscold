@@ -150,13 +150,10 @@ namespace Slingscold.Frontend {
             double width = size_old.width + (size_new.width - (double) size_old.width) * progress;
 
             context.set_source_rgba (0.2, 0.2, 0.2, 0.7); //gray color
-            double offset = 0.0;
-            double radius = 18.0;
+            double offset = 7.0;
+            double radius = 12.0;
             context.move_to (x + radius, size.y + offset);
-		    context.arc (x + width - radius - offset, size.y + radius + offset, radius, Math.PI * 1.5, Math.PI * 2);
-		    context.arc (x + width - radius - offset, size.y + size.height - radius - offset, radius, 0, Math.PI * 0.5);
-		    context.arc (x + radius + offset, size.y + size.height - radius - offset, radius, Math.PI * 0.5, Math.PI);
-		    context.arc (x + radius + offset, size.y + radius + offset, radius, Math.PI, Math.PI * 1.5);
+            context.arc (x + width - radius - offset, size.y + size.height - radius - (offset / 2), radius, 0, Math.PI * 2);
             context.fill ();
 
             return false;
