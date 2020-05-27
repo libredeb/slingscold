@@ -34,6 +34,7 @@ namespace Slingscold.Frontend {
         public new GLib.List<Gtk.Widget> children;
         public int active = -1;
         private int old_active = -1;
+        private int skip_flag = 0;
 
         public Indicators () {
 
@@ -84,8 +85,11 @@ namespace Slingscold.Frontend {
         }
 
         public void set_active (int index) {
+            skip_flag++;
             this.set_active_no_signal (index);
-            this.child_activated (); // send signal
+            if (skip_flag > 1) { // avoid activating a page "0" that does not exist
+                this.child_activated (); // send signal
+            }
         }
 
         public void change_focus () {
