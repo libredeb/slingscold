@@ -295,8 +295,8 @@ public class SlingscoldWindow : Widgets.CompositedWindow {
         // Semi-dark background
         var linear_gradient = new Cairo.Pattern.linear (size.x, size.y, size.x, size.y + size.height);
         linear_gradient.add_color_stop_rgba (0.0, 0.0, 0.0, 0.0, 1);
-        linear_gradient.add_color_stop_rgba (0.50, 0.0, 0.0, 0.0, 0.85);
-        linear_gradient.add_color_stop_rgba (0.99, 0.0, 0.0, 0.0, 0.50);
+        linear_gradient.add_color_stop_rgba (0.50, 0.0, 0.0, 0.0, 0.90);
+        linear_gradient.add_color_stop_rgba (0.99, 0.0, 0.0, 0.0, 0.80);
                 
         context.set_source (linear_gradient);
         context.paint ();

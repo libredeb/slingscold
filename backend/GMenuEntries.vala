@@ -94,6 +94,12 @@ namespace Slingscold.Backend {
                                 icons[app_to_add["command"]] = icon_theme.load_icon(app_icon, icon_size, 0).scale_simple(icon_size, icon_size, Gdk.InterpType.BILINEAR);
                             } else if (GLib.File.new_for_path(app_icon).query_exists()) {
                                 icons[app_to_add["command"]] = new Gdk.Pixbuf.from_file_at_scale (app_icon.to_string (), -1, icon_size, true);
+                            } else if (GLib.File.new_for_path("/usr/share/pixmaps/" + app_icon + ".png").query_exists()) {
+                                icons[app_to_add["command"]] = new Gdk.Pixbuf.from_file_at_scale ("/usr/share/pixmaps/" + app_icon + ".png", -1, icon_size, true);
+                            } else if (GLib.File.new_for_path("/usr/share/pixmaps/" + app_icon + ".svg").query_exists()) {
+                                icons[app_to_add["command"]] = new Gdk.Pixbuf.from_file_at_scale ("/usr/share/pixmaps/" + app_icon + ".svg", -1, icon_size, true);
+                            } else if (GLib.File.new_for_path("/usr/share/pixmaps/" + app_icon + ".xpm").query_exists()) {
+                                icons[app_to_add["command"]] = new Gdk.Pixbuf.from_file_at_scale ("/usr/share/pixmaps/" + app_icon + ".xpm", -1, icon_size, true);
                             } else {
                                 icons[app_to_add["command"]] = icon_theme.load_icon("application-default-icon", icon_size, 0);
                             }
