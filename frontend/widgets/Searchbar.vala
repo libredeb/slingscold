@@ -140,7 +140,7 @@ namespace Slingscold.Frontend {
         private void reset_font () {
         
             var color = Gdk.RGBA ();
-            color.parse ("#444");
+            color.parse ("#FFFFFF");
             this.label.override_color (Gtk.StateFlags.NORMAL, color);
             this.label.override_font (Pango.FontDescription.from_string ("normal"));
             this.is_hinted = false;
@@ -170,9 +170,9 @@ namespace Slingscold.Frontend {
             
             // Draw background gradient
             var linear_fill = new Cairo.Pattern.linear(size.x, size.y, size.x, size.y + size.height);
-            linear_fill.add_color_stop_rgb(0.0,  0.85, 0.85, 0.85);
-            linear_fill.add_color_stop_rgb(0.25,  1.0, 1.0, 1.0);
-            linear_fill.add_color_stop_rgb(1.0,  1.0, 1.0, 1.0);
+            linear_fill.add_color_stop_rgb(0.0,  0.1, 0.1, 0.12);
+            linear_fill.add_color_stop_rgb(0.25, 0.1, 0.1, 0.12);
+            linear_fill.add_color_stop_rgb(1.0,  0.1, 0.1, 0.12);
             context.set_source (linear_fill);
             context.fill_preserve ();
             
