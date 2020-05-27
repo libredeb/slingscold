@@ -158,7 +158,7 @@ namespace Slingscold.Frontend {
                     
                     var gradient = new Cairo.Pattern.rgba (0.0, 0.0, 0.0, 0.0);
 
-                    context.set_source (linear_gradient);
+                    context.set_source (gradient);
                     Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 10, 0.5, size);
                     context.fill ();
                 }
