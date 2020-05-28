@@ -57,7 +57,13 @@ namespace Slingscold.Frontend {
             label.override_font (font);
 
             // make sure the child widget is added with padding
-            indicator.add(Slingscold.Frontend.Utilities.wrap_alignment(label, 5, 15, 5, 15));
+            label.set_halign(Gtk.Align.CENTER);
+            label.set_valign(Gtk.Align.CENTER);
+            label.set_margin_top(5);
+            label.set_margin_bottom(5);
+            label.set_margin_start(15);
+            label.set_margin_end(15);
+            indicator.add(label);
             this.children.append(indicator);
 
 

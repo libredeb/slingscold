@@ -23,17 +23,6 @@ namespace Slingscold.Frontend {
 
     class Utilities : GLib.Object {
 
-		public static Gtk.Alignment wrap_alignment(Gtk.Widget widget, int top, int right, int bottom, int left) {
-			var alignment = new Gtk.Alignment(0.0f, 0.0f, 1.0f, 1.0f);
-			alignment.top_padding = top;
-			alignment.right_padding = right;
-			alignment.bottom_padding = bottom;
-			alignment.left_padding = left;
-			
-			alignment.add(widget);
-			return alignment;
-		}
-		
 		public static void draw_rounded_rectangle(Cairo.Context context, double radius, double offset, Gtk.Allocation size) {
 			context.move_to (size.x + radius, size.y + offset);
 		    context.arc (size.x + size.width - radius - offset, size.y + radius + offset, radius, Math.PI * 1.5, Math.PI * 2);
