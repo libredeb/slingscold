@@ -158,7 +158,7 @@ namespace Slingscold.Frontend {
             var context = Gdk.cairo_create (widget.get_window ());
             
             // Draw bottom white border
-            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 12, -0.5, size);
+            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 6, -0.5, size);
             var linear_stroke = new Cairo.Pattern.linear(size.x, size.y, size.x, size.y + size.height);
             linear_stroke.add_color_stop_rgba (0.0,  1.0, 1.0, 1.0, 0.0);
             linear_stroke.add_color_stop_rgba (0.85,  1.0, 1.0, 1.0, 0.0);
@@ -166,13 +166,13 @@ namespace Slingscold.Frontend {
             context.set_source (linear_stroke);
             context.fill ();
             
-            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 12, 0.5, size);
+            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 6, 0.5, size);
             
             // Draw background gradient
             var linear_fill = new Cairo.Pattern.linear(size.x, size.y, size.x, size.y + size.height);
-            linear_fill.add_color_stop_rgb(0.0,  0.1, 0.1, 0.12);
-            linear_fill.add_color_stop_rgb(0.25, 0.1, 0.1, 0.12);
-            linear_fill.add_color_stop_rgb(1.0,  0.1, 0.1, 0.12);
+            linear_fill.add_color_stop_rgb(0.0,  0.08, 0.1, 0.12);
+            linear_fill.add_color_stop_rgb(0.25, 0.08, 0.1, 0.12);
+            linear_fill.add_color_stop_rgb(1.0,  0.08, 0.1, 0.12);
             context.set_source (linear_fill);
             context.fill_preserve ();
             
@@ -183,7 +183,7 @@ namespace Slingscold.Frontend {
             
             // Draw inner stroke
             // Draw bottom white border
-            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 12, 1.5, size);
+            Slingscold.Frontend.Utilities.draw_rounded_rectangle (context, 6, 1.5, size);
             context.set_source_rgba (0.0, 0.0, 0.0, 0.2);
             context.stroke ();
             
