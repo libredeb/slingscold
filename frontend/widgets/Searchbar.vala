@@ -93,12 +93,6 @@ namespace Slingscold.Frontend {
             var clear_icon_wrapper = new Gtk.EventBox ();
             clear_icon_wrapper.set_visible_window (false);
             clear_icon_wrapper.border_width = 4;
-            var stock_item = Gtk.StockItem ();
-            stock_item.stock_id = "edit-clear-symbolic";
-            stock_item.label = null;
-            stock_item.modifier = 0;
-            stock_item.keyval = 0;
-            stock_item.translation_domain = "edit-clear";
             this.clear_icon = new Gtk.Image.from_icon_name("edit-clear-symbolic", Gtk.IconSize.MENU);
             
             clear_icon_wrapper.add (this.clear_icon);

@@ -39,7 +39,7 @@ public class SlingscoldWindow : Widgets.CompositedWindow {
     
         Gdk.Rectangle monitor_dimensions;
         Gdk.Screen screen = Gdk.Screen.get_default();
-        screen.get_monitor_geometry(screen.get_primary_monitor(), out monitor_dimensions);
+        monitor_dimensions = screen.get_display().get_primary_monitor().get_geometry();
         
         // Show desktop
         //Wnck.Screen.get_default().toggle_showing_desktop (false);
